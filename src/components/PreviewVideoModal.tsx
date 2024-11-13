@@ -12,7 +12,8 @@ export default function PreviewVideoModal({setVisible, selectedChannel}: Preview
     return (
         <Modal visible onDismiss={() => setVisible(false)}
             header={<Header variant="h2">Stream Preview</Header>}>
-                <PreviewVideo selectedChannel={selectedChannel} disableDelayedReload={true} />
+                {selectedChannel == null ? <p style={{textAlign: 'center',}}>Not linked to a channel, nothing to preview.</p> :
+                 <PreviewVideo selectedChannel={selectedChannel} disableDelayedReload={true} />}
         </Modal>
     )
 }
