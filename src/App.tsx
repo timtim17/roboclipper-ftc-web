@@ -1,10 +1,12 @@
 import "@cloudscape-design/global-styles/index.css";
+import '@aws-amplify/ui-react/styles.css';
 import "./App.css";
 
 import { useContext, useEffect, useState } from "react";
 import { FTCLiveContext } from "./contexts/FTCLiveContext";
 import { Mode, applyMode } from '@cloudscape-design/global-styles';
 import { Channel } from "./types/ElementalMedia";
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import * as awsui from "@cloudscape-design/design-tokens";
 import Box from "@cloudscape-design/components/box";
 import FinishModal from "./components/FinishModal";
@@ -137,4 +139,12 @@ function getDarkThemePreference() {
     return storedPreference === 'true';
 }
 
-export default App;
+export default withAuthenticator(App, {
+    hideSignUp: true,
+    loginMechanism: 'username',
+    components: {
+        SignIn: {
+            Footer: () => null,
+        },
+    },
+});

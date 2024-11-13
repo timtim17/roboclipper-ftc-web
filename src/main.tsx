@@ -4,6 +4,7 @@ import App from "./App";
 import I18nProvider from "@cloudscape-design/components/i18n";
 import enMessages from '@cloudscape-design/components/i18n/messages/all.en';
 import { applyTheme, Theme } from "@cloudscape-design/components/theming";
+import { Theme as AmplifyTheme, ThemeProvider } from '@aws-amplify/ui-react';
 import { FTCLiveProvider } from "./contexts/FTCLiveContext";
 
 const theme: Theme = {
@@ -24,11 +25,40 @@ const theme: Theme = {
 
 applyTheme({theme});
 
+const amplifyTheme: AmplifyTheme = {
+    name: 'ftclive-amplify-theme',
+    tokens: {
+        components: {
+            button: {
+                primary: {
+                  backgroundColor: '#f08f4a',
+                  _hover: {
+                    backgroundColor: '#0083AE',
+                  },
+                  _focus: {
+                    backgroundColor: '#0083AE',
+                  }
+                },
+                link: {
+                  color: '#0083AE',
+                },
+            },
+            fieldcontrol: {
+                _focus: {
+                    boxShadow: '0 0 0 2px #ABD8E7',
+                },
+            },
+        },
+    },
+};
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <I18nProvider messages={[enMessages,]} locale="en">
         <FTCLiveProvider>
-            <App />
+            <ThemeProvider theme={amplifyTheme}>
+                <App />
+            </ThemeProvider>
         </FTCLiveProvider>
     </I18nProvider>
   </React.StrictMode>,
