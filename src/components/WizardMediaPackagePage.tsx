@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // import { invoke } from '@tauri-apps/api/core';
-const invoke = (...args: any) => Promise.reject('Not implemented');
+const invoke = (..._args: any) => Promise.reject('Not implemented');
 import Box from '@cloudscape-design/components/box';
 import Button from '@cloudscape-design/components/button';
 import Header from '@cloudscape-design/components/header';

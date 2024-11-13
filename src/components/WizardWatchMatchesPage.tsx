@@ -8,7 +8,7 @@ import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import { StatusIndicator } from "@cloudscape-design/components";
 // import { invoke } from '@tauri-apps/api/core';
-const invoke = (...args: any) => Promise.reject('Not implemented');
+const invoke = (..._args: any) => Promise.reject('Not implemented');
 
 interface WizardWatchMatchesPageProps {
     isWatching: boolean;

@@ -5,7 +5,7 @@ import StatusIndicator from "@cloudscape-design/components/status-indicator";
 import { Channel } from "../types/ElementalMedia";
 import { useState } from "react";
 // import { invoke } from '@tauri-apps/api/core';
-const invoke = (...args: any) => Promise.reject('Not implemented');
+const invoke = (..._args: any) => Promise.reject('Not implemented');
 
 interface WizardStopStreamPageProps {
     selectedChannel: Channel | null;
