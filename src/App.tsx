@@ -141,7 +141,6 @@ function getDarkThemePreference() {
 
 export default withAuthenticator(App, {
     hideSignUp: true,
-    loginMechanism: 'email',
     components: {
         SignIn: {
             Footer: () => null,

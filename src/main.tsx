@@ -3,9 +3,13 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import I18nProvider from "@cloudscape-design/components/i18n";
 import enMessages from '@cloudscape-design/components/i18n/messages/all.en';
+import { Amplify } from "aws-amplify"
+import amplifyOutputs from "../amplify_outputs.json"
 import { applyTheme, Theme } from "@cloudscape-design/components/theming";
 import { Theme as AmplifyTheme, ThemeProvider } from '@aws-amplify/ui-react';
 import { FTCLiveProvider } from "./contexts/FTCLiveContext";
+
+Amplify.configure(amplifyOutputs);
 
 const theme: Theme = {
     tokens: {
