@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-// import { invoke } from '@tauri-apps/api/core';
-const invoke = (..._args: any) => Promise.reject('Not implemented');
 import Box from '@cloudscape-design/components/box';
 import Button from '@cloudscape-design/components/button';
 import Header from '@cloudscape-design/components/header';
 import Table from "@cloudscape-design/components/table";
 import { Channel } from "../types/ElementalMedia";
+import { fetchMediaLiveChannels } from "../util/aws-elemental";
 
 interface WizardMediaPackagePageProps {
     setError: (value: string) => void;
@@ -18,7 +17,7 @@ export default function WizardMediaPackagePage({setError, selectedChannel, setSe
     const [channels, setChannels] = useState<Channel[]>([]);
     const fetchChannels = () => {
         setFetchingChannels(true);
-        invoke('get_ml_channels')
+        fetchMediaLiveChannels()
             .then(data => setChannels(data as Channel[]))
             .then(() => setError(""))
             .then(() => setFetchingChannels(false))

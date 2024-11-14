@@ -1,4 +1,5 @@
 import { defineBackend } from '@aws-amplify/backend';
+import { aws_iam as iam } from 'aws-cdk-lib';
 import { auth } from './auth/resource';
 
 /**
@@ -8,7 +9,7 @@ const backend = defineBackend({
   auth,
 });
 
-const { cfnIdentityPool, cfnUserPool } = backend.auth.resources.cfnResources;
+const { cfnUserPool, cfnIdentityPool, cfnIdentityPoolRoleAttachment } = backend.auth.resources.cfnResources;
 cfnIdentityPool.allowUnauthenticatedIdentities = false;
 cfnUserPool.adminCreateUserConfig = {
     ...cfnUserPool.adminCreateUserConfig,
@@ -24,3 +25,27 @@ cfnUserPool.policies = {
         temporaryPasswordValidityDays: 365,
     },
 };
+// add an inline policy to the identity pool's authenticated role attachment
+const authenticatedRole = iam.Role.fromRoleArn(backend.stack, 'AuthenticatedRole', cfnIdentityPoolRoleAttachment.roles.authenticated);
+authenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: [
+        'medialive:StartChannel',
+        'medialive:StopChannel',
+        'mediapackage:CreateHarvestJob',
+        'medialive:ListChannels',
+        'medialive:DescribeChannel',
+        'mediapackage:ListOriginEndpoints',
+        'mediapackage:DescribeChannel',
+        'mediapackage:ListChannels',
+        'medialive:DescribeInput',
+    ],
+    resources: ['*'],
+}));
+authenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
+    effect: iam.Effect.ALLOW,
+    actions: [
+        'iam:PassRole',
+    ],
+    resources: ['arn:aws:iam::267253737119:role/RobotClipperStack-IAMHarvestRole03C319BB-6UVcrXeUeVYK'],
+}));

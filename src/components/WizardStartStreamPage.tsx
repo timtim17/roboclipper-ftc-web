@@ -5,9 +5,8 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import StatusIndicator from "@cloudscape-design/components/status-indicator";
 import { Channel } from "../types/ElementalMedia";
 import { useState } from "react";
-// import { invoke } from '@tauri-apps/api/core';
-const invoke = (..._args: any) => Promise.reject('Not implemented');
 import { PreviewVideo } from "./PreviewVideo";
+import { startMediaLiveChannel } from "../util/aws-elemental";
 
 interface WizardStartStreamPageProps {
     selectedChannel: Channel | null;
@@ -19,8 +18,9 @@ export default function WizardStartStreamPage({selectedChannel, isStreaming, set
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const startStreaming = () => {
+        if (selectedChannel == null) return;
         setIsLoading(true);
-        invoke('start_ml_channel', {channelId: selectedChannel?.medialive_channel_id})
+        startMediaLiveChannel(selectedChannel.medialive_channel_id)
             .then(() => setError(null))
             .then(() => setIsStreaming(true))
             .catch(err => {

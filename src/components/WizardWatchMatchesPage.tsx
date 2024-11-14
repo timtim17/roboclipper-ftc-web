@@ -7,8 +7,7 @@ import Table from "@cloudscape-design/components/table";
 import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import { StatusIndicator } from "@cloudscape-design/components";
-// import { invoke } from '@tauri-apps/api/core';
-const invoke = (..._args: any) => Promise.reject('Not implemented');
+import { clipMatch } from "../util/aws-elemental";
 
 interface WizardWatchMatchesPageProps {
     isWatching: boolean;
@@ -69,9 +68,9 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                                     matchName: items[i].payload.shortName,
                                     mpEndpointId: mpChannelId,
                                 });
-                                invoke('clip_match', {
+                                clipMatch({
                                     timestamp: Math.round(items[i].updateTime / 1000),   // millis to seconds
-                                    eventKey: selectedEvent?.eventCode,
+                                    eventKey: selectedEvent?.eventCode ?? 'unknown',
                                     matchName: items[i].payload.shortName,
                                     mpEndpointId: mpChannelId,
                                 })

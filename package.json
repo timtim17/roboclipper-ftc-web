@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^6.5.5",
+    "@aws-sdk/client-medialive": "^3.691.0",
+    "@aws-sdk/client-mediapackage": "^3.691.0",
+    "@aws-sdk/types": "^3.686.0",
     "@cloudscape-design/components": "^3.0.781",
     "@cloudscape-design/design-tokens": "^3.0.44",
     "@cloudscape-design/global-styles": "^1.0.32",
@@ -27,7 +30,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "aws-cdk": "^2.166.0",
-    "aws-cdk-lib": "^2.166.0",
+    "aws-cdk-lib": "^2.167.0",
     "constructs": "^10.4.2",
     "esbuild": "^0.24.0",
     "eslint": "^9.13.0",
