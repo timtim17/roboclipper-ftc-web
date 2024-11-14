@@ -1,10 +1,6 @@
-import Box from "@cloudscape-design/components/box";
-import Button from "@cloudscape-design/components/button";
 import Header from "@cloudscape-design/components/header";
 import Modal from "@cloudscape-design/components/modal";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-// import { exit } from '@tauri-apps/plugin-process';
-const exit = window.close.bind(window);
 
 interface FinishModalProps {
     visible: boolean;
@@ -12,19 +8,15 @@ interface FinishModalProps {
 }
 
 export default function FinishModal({visible, setVisible}: FinishModalProps) {
+    const isObs = 'obsstudio' in window;
     return (
         <Modal visible={visible} onDismiss={() => setVisible(false)}
-            header={<Header variant="h2">Close program?</Header>}
-            footer={
-                <Box float="right">
-                    <SpaceBetween size="xxs" direction="horizontal">
-                        <Button onClick={async () => await exit()}>Yes</Button>
-                        <Button onClick={() => setVisible(false)}>No</Button>
-                    </SpaceBetween>
-                </Box>
-            }>
-                Are you sure you want to exit?
-                You will need to restart setup to continue clipping matches.
+            header={<Header variant="h2">{isObs ? "Can't exit an OBS dock..." : "Close the tab to exit"}</Header>}>
+            <SpaceBetween size="xs" direction="vertical" alignItems="center">
+                <img src="/close-modal.gif" style={{margin: 'auto', display: 'block',}} />
+                {!isObs && <small><em>(Javascript <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/close">can't</a> close tabs that it didn't open)</em></small>}
+                <span>¯\_(ツ)_/¯</span>
+            </SpaceBetween>
         </Modal>
     )
 }
