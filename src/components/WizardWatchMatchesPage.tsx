@@ -1,5 +1,6 @@
 import Button from "@cloudscape-design/components/button";
 import Container from "@cloudscape-design/components/container";
+import Link from "@cloudscape-design/components/link";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useContext, useEffect, useState } from "react";
 import { FTCLiveContext } from "../contexts/FTCLiveContext";
@@ -142,12 +143,20 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                                 </StatusIndicator>
                             ),
                         },
+                        {
+                            id: 'link',
+                            header: 'Clip Output*',
+                            cell: item => item.isClippedPost ? <Link external target='_blank' href={`https://robotclipperstack-finalbucket3b40afdb-2gs17pofhpnt.s3.us-west-2.amazonaws.com/FTC/${selectedEvent?.eventCode}/${item.payload.shortName}.mp4`}>
+                                Link
+                            </Link> : <></>
+                        },
                     ]}
                     empty={
                         <Box margin={{ vertical: "xs" }} textAlign="center">
                             <b>No matches yet</b>
                         </Box>
                     } />
+                    <small>*Video link will only be available after processing.</small>
             </SpaceBetween>
         </Container>
     );
