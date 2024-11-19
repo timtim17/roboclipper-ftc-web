@@ -1,5 +1,6 @@
 import Button from "@cloudscape-design/components/button";
 import Container from "@cloudscape-design/components/container";
+import ExpandingSection from "@cloudscape-design/components/expandable-section";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
@@ -72,6 +73,27 @@ export default function WizardScoringSystemPage({setError}: WizardScoringSystemP
                         invalid={selectedOption != null && !events.some(event => event.eventCode === selectedOption.value)}
                         onChange={ev => setSelectedOption(ev.detail.selectedOption)} />
                 </FormField>
+                <ExpandingSection headerText="Issues connecting to FTCLive?">
+                    <p>Try connecting to the scoring system in another tab to verify that it is accessible.</p>
+                    <p>
+                        You may need to enable "Insecure content" in your browser settings for this
+                        tool to access the scoring system. For example, in Chrome:
+                        <ol>
+                            <li>
+                                Select the icon next to the URL and go to "Site settings"<br />
+                                <img src="/insecure_content_1.png" />
+                            </li>
+                            <li>
+                                Find "Insecure content" and set it to "Allow"<br />
+                                <img src="/insecure_content_2.png" />
+                            </li>
+                            <li>
+                                Refresh this page<br />
+                                <Button onClick={() => location.reload()}>Refresh</Button>
+                            </li>
+                        </ol>
+                    </p>
+                </ExpandingSection>
             </SpaceBetween>
         </Container>
     );

@@ -25,7 +25,6 @@ cfnUserPool.policies = {
         temporaryPasswordValidityDays: 365,
     },
 };
-// add an inline policy to the identity pool's authenticated role attachment
 const authenticatedRole = iam.Role.fromRoleArn(backend.stack, 'AuthenticatedRole', cfnIdentityPoolRoleAttachment.roles.authenticated);
 authenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
     effect: iam.Effect.ALLOW,

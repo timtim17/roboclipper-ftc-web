@@ -8,3 +8,11 @@ body {
     height: 100vh;
     box-sizing: border-box;
 }
+
+li img {
+    width: 40%;
+}
+
+li img, li button {
+    margin-top: 8px;
+}
