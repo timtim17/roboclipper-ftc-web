@@ -125,30 +125,61 @@ interface HarvestJobParams {
     mpEndpointId: string;
 }
 
+interface HarvestJobParamsInternal extends HarvestJobParams {
+    part: number;
+    maxParts: number;
+    startTime: number,
+    endTime: number,
+}
+
 // TODO: put these somewhere better
 const DESTINATION_BUCKET_NAME = 'robotclipperstack-intermediatebucketc22de796-8eq47dcme2nq';
 const IAM_HARVEST_ROLE = 'arn:aws:iam::267253737119:role/RobotClipperStack-IAMHarvestRole03C319BB-6UVcrXeUeVYK';
 
+export async function clipMatchGameplay(params : HarvestJobParams) {
+    clipMatch({
+        ...params,
+        part: 1,
+        maxParts: 2,
+        startTime: params.timestamp - 10, // start time minus 10s
+        endTime: params.timestamp + 165, // start time plus 2m45s (165s)
+    });
+}
+
+export async function clipMatchPost(params : HarvestJobParams) {
+    clipMatch({
+        ...params,
+        part: 2,
+        maxParts: 2,
+        startTime: params.timestamp, // post time +/- 0
+        endTime: params.timestamp + 30, // post time plus 30s
+    });
+}
+
 export async function clipMatch({ 
-    timestamp, 
-    eventKey, 
-    matchName, 
-    mpEndpointId 
-} : HarvestJobParams) {
+    eventKey,
+    matchName,
+    mpEndpointId,
+    part,
+    maxParts,
+    startTime,
+    endTime,
+} : HarvestJobParamsInternal) {
+    if (part > maxParts) {
+        throw new Error(`Part number ${part} is greater than the maximum number of parts ${maxParts}`);
+    }
     try {
         const credentials = await getCredentials();
         const client = await createMediaPackageClient(credentials);
         const fileNameKey = buildKey(eventKey, matchName);
         const harvestEpoch = Math.floor(Date.now() / 1000);
-        const startTime = timestamp - 10; // start time minus 10s
-        const endTime = timestamp + 165; // start time plus 2m45s (165s)
         await client.send(new CreateHarvestJobCommand({
-            Id: `${harvestEpoch}-${fileNameKey}`,
+            Id: `${harvestEpoch}-${fileNameKey}-${part}`,
             OriginEndpointId: mpEndpointId,
             S3Destination: {
                 BucketName: DESTINATION_BUCKET_NAME,
-                ManifestKey: `${fileNameKey}/${fileNameKey}.m3u8`,
-                RoleArn: IAM_HARVEST_ROLE
+                ManifestKey: `${fileNameKey}/${part}_${maxParts}/main.m3u8`,
+                RoleArn: IAM_HARVEST_ROLE,
             },
             StartTime: startTime.toString(),
             EndTime: endTime.toString()

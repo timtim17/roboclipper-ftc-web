@@ -34,7 +34,7 @@ export const FTCLiveProvider: React.FC<FTCLiveProviderProps> = ({ children }) =>
   const [latestStreamData, setLatestStreamData] = useState<FTCLiveSteamData|undefined>();
   const [isConnected, setConnected] = useState<boolean>(false);
   const [socket, setSocket] = useState<WebSocket | undefined>();
-  const [selectedTriggers, setSelectedTriggers] = useState<UpdateType[]>(['MATCH_START', 'MATCH_COMMIT', 'MATCH_ABORT',]);
+  const [selectedTriggers, setSelectedTriggers] = useState<UpdateType[]>(['MATCH_START', 'MATCH_COMMIT', 'MATCH_ABORT', 'MATCH_POST',]);
 
   // The function to connect the WebSocket and handle messages
   const connectWebSocket = useCallback((connect: boolean) => {

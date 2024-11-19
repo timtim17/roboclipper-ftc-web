@@ -7,7 +7,7 @@ import Table from "@cloudscape-design/components/table";
 import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import { StatusIndicator } from "@cloudscape-design/components";
-import { clipMatch } from "../util/aws-elemental";
+import { clipMatchGameplay, clipMatchPost } from "../util/aws-elemental";
 
 interface WizardWatchMatchesPageProps {
     isWatching: boolean;
@@ -26,6 +26,7 @@ interface MatchItem {
     isCommitted: boolean;
     isClipped: boolean;
     isClippedError: boolean;
+    isClippedPost: boolean;
 }
 
 export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpChannelId}: WizardWatchMatchesPageProps) {
@@ -46,11 +47,12 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                         isCommitted: false,
                         isClipped: false,
                         isClippedError: false,
+                        isClippedPost: false,
                     });
                     break;
                 case 'MATCH_ABORT':
                     for (let i = items.length - 1; i >= 0; i--) {
-                        if (items[i].payload.number === latestStreamData.payload.number) {
+                        if (items[i].payload.shortName === latestStreamData.payload.shortName) {
                             items[i].isAborted = true;
                             break match_type_switch;
                         }
@@ -59,16 +61,10 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                     break;
                 case 'MATCH_COMMIT':
                     for (let i = items.length - 1; i >= 0; i--) {
-                        if (items[i].payload.number === latestStreamData.payload.number) {
+                        if (items[i].payload.shortName === latestStreamData.payload.shortName) {
                             items[i].isCommitted = true;
                             if (!items[i].isClipped) {
-                                console.log({
-                                    timestamp: Math.round(items[i].updateTime / 1000),   // millis to seconds
-                                    eventKey: selectedEvent?.eventCode,
-                                    matchName: items[i].payload.shortName,
-                                    mpEndpointId: mpChannelId,
-                                });
-                                clipMatch({
+                                clipMatchGameplay({
                                     timestamp: Math.round(items[i].updateTime / 1000),   // millis to seconds
                                     eventKey: selectedEvent?.eventCode ?? 'unknown',
                                     matchName: items[i].payload.shortName,
@@ -85,6 +81,28 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                         }
                     }
                     console.warn("Couldn't find committed match", latestStreamData, items);
+                    break;
+                case 'MATCH_POST':
+                    for (let i = items.length - 1; i >= 0; i--) {
+                        if (items[i].payload.shortName === latestStreamData.payload.shortName) {
+                            if (!items[i].isClippedPost) {
+                                setTimeout(() => clipMatchPost({
+                                        timestamp: Math.round(latestStreamData.updateTime / 1000),   // millis to seconds
+                                        eventKey: selectedEvent?.eventCode ?? 'unknown',
+                                        matchName: items[i].payload.shortName,
+                                        mpEndpointId: mpChannelId,
+                                    })
+                                        .then(() => items[i].isClippedPost = true)
+                                        .catch(err => {
+                                            console.error(err);
+                                            items[i].isClippedError = true;
+                                        })
+                                        .finally(() => setItems([...items])), 30_000);
+                            }
+                            break match_type_switch;
+                        }
+                    }
+                    console.warn("Couldn't find posted match", latestStreamData, items);
                     break;
             }
             setItems([...items]);
@@ -119,8 +137,8 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                             id: "status",
                             header: "Status",
                             cell: item => (
-                                <StatusIndicator type={item.isAborted ? "stopped" : item.isClippedError ? 'error' : item.isClipped ? 'success' : item.isCommitted ? 'pending' : 'in-progress'}>
-                                    {item.isAborted ? "Aborted" : item.isClippedError ? 'Error' : item.isClipped ? 'Succeeded' : item.isCommitted ? 'Pending' : 'In Progress'}
+                                <StatusIndicator type={item.isAborted ? "stopped" : item.isClippedError ? 'error' : item.isClippedPost ? 'success' : item.isCommitted ? 'pending' : 'in-progress'}>
+                                    {item.isAborted ? "Aborted" : item.isClippedError ? 'Error' : item.isClippedPost ? 'Succeeded' : item.isCommitted ? 'Pending' : 'In Progress'}
                                 </StatusIndicator>
                             ),
                         },
