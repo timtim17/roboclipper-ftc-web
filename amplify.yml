@@ -4,7 +4,6 @@ frontend:
     preBuild:
       commands:
         - npm ci --cache .npm --prefer-offline
-        - npx @sentry/wizard@latest -i sourcemaps --saas
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
     build:
       commands:

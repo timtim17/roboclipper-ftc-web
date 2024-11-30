@@ -9,7 +9,7 @@ import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import { StatusIndicator } from "@cloudscape-design/components";
 import { clipMatchGameplay, clipMatchPost } from "../util/aws-elemental";
-import { CWLoggingProvider, useCloudWatchLogging } from "../contexts/CWLoggingContext";
+import { useCloudWatchLogging } from "../contexts/CWLoggingContext";
 
 interface WizardWatchMatchesPageProps {
     isWatching: boolean;
