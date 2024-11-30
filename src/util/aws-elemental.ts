@@ -162,20 +162,24 @@ export async function clipMatchPost(params: HarvestJobParams) {
             region: 'us-west-2',
             credentials,
         });
-        await client.send(new InvokeCommand({
-            FunctionName: 'RobotClipperStack-TransLambda8F087F05-PR9MoqT4hcVu',
-            InvocationType: 'Event',
-            Payload: JSON.stringify({
-                detail: {
-                    harvest_job: {
-                        "s3_destination": {
-                            "bucket_name": DESTINATION_BUCKET_NAME,
-                            "manifest_key": `${buildKey(params.eventKey, params.matchName)}/2_2/index.m3u8`,
+        try {
+            await client.send(new InvokeCommand({
+                FunctionName: 'RobotClipperStack-TransLambda8F087F05-PR9MoqT4hcVu',
+                InvocationType: 'Event',
+                Payload: JSON.stringify({
+                    detail: {
+                        harvest_job: {
+                            "s3_destination": {
+                                "bucket_name": DESTINATION_BUCKET_NAME,
+                                "manifest_key": `${buildKey(params.eventKey, params.matchName)}/2_2/index.m3u8`,
+                            },
                         },
                     },
-                },
-            }),
-        }));
+                }),
+            }));
+        } catch (err) {
+            console.error(err);
+        }
     }, 60_000);
 }
 
