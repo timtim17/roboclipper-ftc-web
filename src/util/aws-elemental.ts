@@ -167,6 +167,8 @@ export async function clipMatchPost(params: HarvestJobParams) {
                 FunctionName: 'RobotClipperStack-TransLambda8F087F05-PR9MoqT4hcVu',
                 InvocationType: 'Event',
                 Payload: JSON.stringify({
+                    'detail-type': 'MediaPackage HarvestJob Notification',
+                    source: 'aus-roboclipper-fakeemp',
                     detail: {
                         harvest_job: {
                             "s3_destination": {
