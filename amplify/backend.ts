@@ -51,6 +51,6 @@ authenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
 
 const cwLogGroup = new logs.LogGroup(backend.stack, 'FTCLiveLogs', {
     retention: logs.RetentionDays.ONE_WEEK,
-    logGroupName: 'roboclipper-ftc',
+    logGroupName: 'roboclipper-ftc' + (backend.stack.stackName.includes('sandbox') ? `-${backend.stack.stackName}` : ''),
 });
 cwLogGroup.grantWrite(authenticatedRole);
