@@ -1,5 +1,5 @@
 import { defineBackend } from '@aws-amplify/backend';
-import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_iam as iam, aws_logs as logs } from 'aws-cdk-lib';
 import { auth } from './auth/resource';
 
 /**
@@ -48,3 +48,9 @@ authenticatedRole.addToPrincipalPolicy(new iam.PolicyStatement({
     ],
     resources: ['arn:aws:iam::267253737119:role/RobotClipperStack-IAMHarvestRole03C319BB-6UVcrXeUeVYK'],
 }));
+
+const cwLogGroup = new logs.LogGroup(backend.stack, 'FTCLiveLogs', {
+    retention: logs.RetentionDays.ONE_WEEK,
+    logGroupName: 'roboclipper-ftc',
+});
+cwLogGroup.grantWrite(authenticatedRole);

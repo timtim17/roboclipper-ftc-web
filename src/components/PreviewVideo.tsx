@@ -18,7 +18,6 @@ export function PreviewVideo({selectedChannel, isStreaming, disableDelayedReload
             if (hls.current == null) {
                 hls.current = new Hls();
             }
-            console.log(selectedChannel);
             if (selectedChannel && selectedChannel.origin_endpoint_url && video.current) {
                 hls.current!.loadSource(selectedChannel.origin_endpoint_url);
                 hls.current!.attachMedia(video.current);

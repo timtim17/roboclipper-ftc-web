@@ -9,6 +9,7 @@ import Header from "@cloudscape-design/components/header";
 import Box from "@cloudscape-design/components/box";
 import { StatusIndicator } from "@cloudscape-design/components";
 import { clipMatchGameplay, clipMatchPost } from "../util/aws-elemental";
+import { CWLoggingProvider, useCloudWatchLogging } from "../contexts/CWLoggingContext";
 
 interface WizardWatchMatchesPageProps {
     isWatching: boolean;
@@ -32,6 +33,7 @@ interface MatchItem {
 
 export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpChannelId}: WizardWatchMatchesPageProps) {
     const {connectWebSocket, latestStreamData, selectedEvent} = useContext(FTCLiveContext)
+    const {log, flushLogs} = useCloudWatchLogging();
     const watching = (value: boolean) => {
         setIsWatching(value);
         connectWebSocket(value);
@@ -39,6 +41,7 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
     const [items, setItems] = useState<MatchItem[]>([]);
     useEffect(() => {
         if (latestStreamData) {
+            log(selectedEvent?.eventCode ?? 'unknown', JSON.stringify(latestStreamData));
             match_type_switch:
             switch (latestStreamData.updateType) {
                 case 'MATCH_START':
@@ -65,12 +68,17 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                         if (items[i].payload.shortName === latestStreamData.payload.shortName) {
                             items[i].isCommitted = true;
                             if (!items[i].isClipped) {
-                                clipMatchGameplay({
+                                const input = {
                                     timestamp: Math.round(items[i].updateTime / 1000),   // millis to seconds
                                     eventKey: selectedEvent?.eventCode ?? 'unknown',
                                     matchName: items[i].payload.shortName,
                                     mpEndpointId: mpChannelId,
-                                })
+                                };
+                                clipMatchGameplay(input)
+                                    .then(() => log(selectedEvent?.eventCode ?? 'unknown', JSON.stringify({
+                                        payload: input,
+                                        updateType: 'CLIP_MATCH',
+                                    })))
                                     .then(() => items[i].isClipped = true)
                                     .catch(err => {
                                         console.error(err);
@@ -87,18 +95,25 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                     for (let i = items.length - 1; i >= 0; i--) {
                         if (items[i].payload.shortName === latestStreamData.payload.shortName) {
                             if (!items[i].isClippedPost) {
-                                setTimeout(() => clipMatchPost({
+                                setTimeout(() => {
+                                    const input = {
                                         timestamp: Math.round(latestStreamData.updateTime / 1000),   // millis to seconds
                                         eventKey: selectedEvent?.eventCode ?? 'unknown',
                                         matchName: items[i].payload.shortName,
                                         mpEndpointId: mpChannelId,
-                                    })
+                                    };
+                                    clipMatchPost(input)
+                                        .then(() => log(selectedEvent?.eventCode ?? 'unknown', JSON.stringify({
+                                            payload: input,
+                                            updateType: 'CLIP_POST',
+                                        })))
                                         .then(() => items[i].isClippedPost = true)
                                         .catch(err => {
                                             console.error(err);
                                             items[i].isClippedError = true;
                                         })
-                                        .finally(() => setItems([...items])), 30_000);
+                                        .finally(() => setItems([...items]))
+                                    }, 30_000);
                             }
                             break match_type_switch;
                         }
@@ -115,7 +130,10 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
             <SpaceBetween direction="vertical" size="s">
                 <SpaceBetween size="s" direction="horizontal">
                     <Button onClick={() => watching(true)} iconName="caret-right-filled" variant="primary" loading={isWatching}>Start Watching</Button>
-                    <Button iconName="close" onClick={() => watching(false)} disabled={!isWatching}>Stop Watching</Button>
+                    <Button iconName="close" onClick={() => {
+                        watching(false);
+                        flushLogs();
+                    }} disabled={!isWatching}>Stop Watching</Button>
                 </SpaceBetween>
                 <Table header={<Header>{selectedEvent?.name ?? ''} Matches</Header>} items={items} sortingDisabled
                     columnDefinitions={[

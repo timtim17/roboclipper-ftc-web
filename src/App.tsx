@@ -18,6 +18,7 @@ import WizardWatchMatchesPage from "./components/WizardWatchMatchesPage";
 import WizardStartStreamPage from "./components/WizardStartStreamPage";
 import WizardStopStreamPage from "./components/WizardStopStreamPage";
 import PreviewVideoModal from "./components/PreviewVideoModal";
+import { CWLoggingProvider } from "./contexts/CWLoggingContext";
 
 const LS_DARK_THEME = 'THEME';
 
@@ -66,64 +67,66 @@ function App() {
                 },
             ]} />
             <Box padding={{top: "xxs", horizontal: "xl"}}>
-                <Wizard submitButtonText="Done" i18nStrings={{cancelButton: ''}}
-                    isLoadingNextStep={isWatching || (activeStepIndex === 2 && !isStreaming)} onSubmit={() => {
-                        if (isStreaming) {
-                            setFinishErrorText("Please stop streaming before exiting.");
-                            return;
-                        }
-                        setFinishModalVisible(true)
-                    }}
-                    activeStepIndex={activeStepIndex} onNavigate={e => {
-                        const requestedStep = e.detail.requestedStepIndex;
-                        if (requestedStep === 1 && selectedEvent === undefined) {
-                            setStepOneErrorText("Please connect to the scoring system and select an event");
-                            return;
-                        }
-                        if (requestedStep === 2 && selectedChannel === null) {
-                            setStepTwoErrorText("Please select a channel");
-                            return;
-                        }
-                        if (requestedStep === 3 && !isStreaming && e.detail.reason === 'next') {
-                            setStepThreeErrorText("Please start streaming before continuing.");
-                            return;
-                        }
-                        setActiveStepIndex(requestedStep);
-                        setStepOneErrorText("");
-                        setStepTwoErrorText("");
-                        setStepThreeErrorText("");
-                    }}
-                    steps={[
-                        {
-                            title: "Connect to FTCLive",
-                            description: "Connect to the scoring system to get information on match timings.",
-                            errorText: stepOneErrorText,
-                            content: <WizardScoringSystemPage setError={setStepOneErrorText} />,
-                        },
-                        {
-                            title: "Connect to AWS",
-                            description: "Select the MediaPackage Channel that should receive requests to harvest clips.",
-                            errorText: stepTwoErrorText,
-                            content: <WizardMediaPackagePage setError={setStepTwoErrorText} selectedChannel={selectedChannel} setSelectedChannel={setSelectedChannel} />,
-                        },
-                        {
-                            title: "Start Streaming",
-                            description: "Start the MediaLive channel before starting the stream in OBS. This will start the stream to the audience (i.e. on YouTube/Twitch).",
-                            errorText: stepThreeErrorText,
-                            content: <WizardStartStreamPage selectedChannel={selectedChannel} isStreaming={isStreaming} setIsStreaming={setIsStreaming} />,
-                        },
-                        {
-                            title: "Watch for Matches",
-                            description: "Leave the software running in the background to watch for matches...",
-                            content: <WizardWatchMatchesPage isWatching={isWatching} setIsWatching={setIsWatching} mpChannelId={selectedChannel?.origin_endpoint_id ?? 'NEVER'} />,
-                        },
-                        {
-                            title: "Stop Streaming",
-                            description: "At the end of the day, please stop the AWS channel to stop streaming and stop incurring costs.",
-                            errorText: finishErrorText,
-                            content: <WizardStopStreamPage selectedChannel={selectedChannel} isStreaming={isStreaming} setIsStreaming={setIsStreaming} />,
-                        },
-                    ]} />
+                <CWLoggingProvider>
+                    <Wizard submitButtonText="Done" i18nStrings={{cancelButton: ''}}
+                        isLoadingNextStep={isWatching || (activeStepIndex === 2 && !isStreaming)} onSubmit={() => {
+                            if (isStreaming) {
+                                setFinishErrorText("Please stop streaming before exiting.");
+                                return;
+                            }
+                            setFinishModalVisible(true)
+                        }}
+                        activeStepIndex={activeStepIndex} onNavigate={e => {
+                            const requestedStep = e.detail.requestedStepIndex;
+                            if (requestedStep === 1 && selectedEvent === undefined) {
+                                setStepOneErrorText("Please connect to the scoring system and select an event");
+                                return;
+                            }
+                            if (requestedStep === 2 && selectedChannel === null) {
+                                setStepTwoErrorText("Please select a channel");
+                                return;
+                            }
+                            if (requestedStep === 3 && !isStreaming && e.detail.reason === 'next') {
+                                setStepThreeErrorText("Please start streaming before continuing.");
+                                return;
+                            }
+                            setActiveStepIndex(requestedStep);
+                            setStepOneErrorText("");
+                            setStepTwoErrorText("");
+                            setStepThreeErrorText("");
+                        }}
+                        steps={[
+                            {
+                                title: "Connect to FTCLive",
+                                description: "Connect to the scoring system to get information on match timings.",
+                                errorText: stepOneErrorText,
+                                content: <WizardScoringSystemPage setError={setStepOneErrorText} />,
+                            },
+                            {
+                                title: "Connect to AWS",
+                                description: "Select the MediaPackage Channel that should receive requests to harvest clips.",
+                                errorText: stepTwoErrorText,
+                                content: <WizardMediaPackagePage setError={setStepTwoErrorText} selectedChannel={selectedChannel} setSelectedChannel={setSelectedChannel} />,
+                            },
+                            {
+                                title: "Start Streaming",
+                                description: "Start the MediaLive channel before starting the stream in OBS. This will start the stream to the audience (i.e. on YouTube/Twitch).",
+                                errorText: stepThreeErrorText,
+                                content: <WizardStartStreamPage selectedChannel={selectedChannel} isStreaming={isStreaming} setIsStreaming={setIsStreaming} />,
+                            },
+                            {
+                                title: "Watch for Matches",
+                                description: "Leave the software running in the background to watch for matches...",
+                                content: <WizardWatchMatchesPage isWatching={isWatching} setIsWatching={setIsWatching} mpChannelId={selectedChannel?.origin_endpoint_id ?? 'NEVER'} />,
+                            },
+                            {
+                                title: "Stop Streaming",
+                                description: "At the end of the day, please stop the AWS channel to stop streaming and stop incurring costs.",
+                                errorText: finishErrorText,
+                                content: <WizardStopStreamPage selectedChannel={selectedChannel} isStreaming={isStreaming} setIsStreaming={setIsStreaming} />,
+                            },
+                        ]} />
+                    </CWLoggingProvider>
             </Box>
         </main>
     );

@@ -1,8 +1,8 @@
-import { fetchAuthSession } from 'aws-amplify/auth';
 import { AwsCredentialIdentity } from '@aws-sdk/types';
 import { MediaLiveClient, ListChannelsCommand, DescribeInputCommand, StartChannelCommand, StopChannelCommand } from '@aws-sdk/client-medialive';
 import { CreateHarvestJobCommand, ListOriginEndpointsCommand, MediaPackageClient } from '@aws-sdk/client-mediapackage';
 import { Channel } from '../types/ElementalMedia';
+import { getCredentials } from './aws-credentials';
 
 function createMediaLiveClient(credentials: AwsCredentialIdentity) {
     return new MediaLiveClient({
@@ -16,12 +16,6 @@ function createMediaPackageClient(credentials: AwsCredentialIdentity) {
         region: 'us-west-2',
         credentials,
     });
-}
-
-async function getCredentials() {
-    const { credentials } = await fetchAuthSession();
-    if (!credentials) throw new Error('Attempted to fetch credentials when not authenticated');
-    return credentials;
 }
 
 export async function fetchMediaLiveChannels() {

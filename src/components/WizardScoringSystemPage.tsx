@@ -45,7 +45,6 @@ export default function WizardScoringSystemPage({setError}: WizardScoringSystemP
     const [options, setOptions] = useState<SelectProps.Options>([]);
     const [selectedOption, setSelectedOption] = useState<null | SelectProps.Option>(null);
     useEffect(() => {
-        console.log('updated events');
         setOptions(events.map(event => ({label: event.name, value: event.eventCode})));
     }, [events]);
     useEffect(() => {
