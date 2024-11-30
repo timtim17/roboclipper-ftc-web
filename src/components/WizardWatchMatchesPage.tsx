@@ -69,7 +69,7 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                             items[i].isCommitted = true;
                             if (!items[i].isClipped) {
                                 const input = {
-                                    timestamp: Math.round(items[i].updateTime / 1000),   // millis to seconds
+                                    timestamp: new Date(items[i].updateTime),
                                     eventKey: selectedEvent?.eventCode ?? 'unknown',
                                     matchName: items[i].payload.shortName,
                                     mpEndpointId: mpChannelId,
@@ -97,7 +97,7 @@ export default function WizardWatchMatchesPage({isWatching, setIsWatching, mpCha
                             if (!items[i].isClippedPost) {
                                 setTimeout(() => {
                                     const input = {
-                                        timestamp: Math.round(latestStreamData.updateTime / 1000),   // millis to seconds
+                                        timestamp: new Date(latestStreamData.updateTime),
                                         eventKey: selectedEvent?.eventCode ?? 'unknown',
                                         matchName: items[i].payload.shortName,
                                         mpEndpointId: mpChannelId,
