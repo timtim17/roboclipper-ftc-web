@@ -78,21 +78,21 @@ export default function WizardScoringSystemPage({setError}: WizardScoringSystemP
                     <p>
                         You may need to enable "Insecure content" in your browser settings for this
                         tool to access the scoring system. For example, in Chrome:
-                        <ol>
-                            <li>
-                                Select the icon next to the URL and go to "Site settings"<br />
-                                <img src="/insecure_content_1.png" />
-                            </li>
-                            <li>
-                                Find "Insecure content" and set it to "Allow"<br />
-                                <img src="/insecure_content_2.png" />
-                            </li>
-                            <li>
-                                Refresh this page<br />
-                                <Button onClick={() => location.reload()}>Refresh</Button>
-                            </li>
-                        </ol>
                     </p>
+                    <ol>
+                        <li>
+                            Select the icon next to the URL and go to "Site settings"<br />
+                            <img src="/insecure_content_1.png" />
+                        </li>
+                        <li>
+                            Find "Insecure content" and set it to "Allow"<br />
+                            <img src="/insecure_content_2.png" />
+                        </li>
+                        <li>
+                            Refresh this page<br />
+                            <Button onClick={() => location.reload()}>Refresh</Button>
+                        </li>
+                    </ol>
                 </ExpandingSection>
             </SpaceBetween>
         </Container>
