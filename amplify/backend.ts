@@ -52,8 +52,3 @@ const cwLogGroup = new logs.LogGroup(backend.stack, 'FTCLiveLogs', {
     logGroupName: 'roboclipper-ftc' + (backend.stack.stackName.includes('sandbox') ? `-${backend.stack.stackName}` : ''),
 });
 cwLogGroup.grantWrite(authenticatedRole);
-
-// bandaid solution: because EMPv2 isn't integrated with EventBridge or Step Functions,
-// manually trigger the Transcode Lambda after ~60 seconds (ew). TODO: fix this
-const transLambda = lambda.Function.fromFunctionName(backend.stack, 'TransLambda', 'RobotClipperStack-TransLambda8F087F05-PR9MoqT4hcVu');
-transLambda.grantInvoke(authenticatedRole);

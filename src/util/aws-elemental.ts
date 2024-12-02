@@ -3,7 +3,6 @@ import { MediaLiveClient, ListChannelsCommand, DescribeInputCommand, StartChanne
 import { CreateHarvestJobCommand, GetOriginEndpointCommand, MediaPackageV2Client } from '@aws-sdk/client-mediapackagev2';
 import { Channel } from '../types/ElementalMedia';
 import { getCredentials } from './aws-credentials';
-import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
 
 function createMediaLiveClient(credentials: AwsCredentialIdentity) {
     return new MediaLiveClient({
@@ -154,35 +153,6 @@ export async function clipMatchPost(params: HarvestJobParams) {
         startTime: params.timestamp, // post time +/- 0
         endTime: new Date(params.timestamp.getTime() + 30 * 1000), // post time plus 30s
     });
-    // bandaid solution: because EMPv2 isn't integrated with EventBridge or Step Functions,
-    // manually trigger the Transcode Lambda after ~60 seconds (ew). TODO: fix this
-    setTimeout(async () => {
-        const credentials = await getCredentials();
-        const client = new LambdaClient({
-            region: 'us-west-2',
-            credentials,
-        });
-        try {
-            await client.send(new InvokeCommand({
-                FunctionName: 'RobotClipperStack-TransLambda8F087F05-PR9MoqT4hcVu',
-                InvocationType: 'Event',
-                Payload: JSON.stringify({
-                    'detail-type': 'MediaPackage HarvestJob Notification',
-                    source: 'aus-roboclipper-fakeemp',
-                    detail: {
-                        harvest_job: {
-                            "s3_destination": {
-                                "bucket_name": DESTINATION_BUCKET_NAME,
-                                "manifest_key": `${buildKey(params.eventKey, params.matchName)}/2_2/index.m3u8`,
-                            },
-                        },
-                    },
-                }),
-            }));
-        } catch (err) {
-            console.error(err);
-        }
-    }, 60_000);
 }
 
 export async function clipMatch({ 
