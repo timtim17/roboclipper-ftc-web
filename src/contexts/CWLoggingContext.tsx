@@ -23,20 +23,11 @@ const LOG_GROUP_NAME = 'roboclipper-ftc';
 const CWLoggingContext = createContext<CWLoggingContextType | undefined>(undefined);
 
 export const CWLoggingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const cwClient = useRef<CloudWatchLogsClient>();
     const logBatches = useRef<LogBatch>({});
     const periodicLoggingTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
     useEffect(() => {
-        getCredentials()
-            .then(credentials => {
-                cwClient.current = new CloudWatchLogsClient({
-                    region: 'us-west-2',
-                    credentials,
-                });
-                periodicLoggingTimer.current = setInterval(() => flushLogs(), 10 * 60 * 1000);
-            })
-            .catch(console.error);
+        periodicLoggingTimer.current = setInterval(() => flushLogs(), 10 * 60 * 1000);
 
         return () => {
             flushLogs();
@@ -45,6 +36,19 @@ export const CWLoggingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             }
         };
     }, []);
+
+    async function getClient() {
+        try {
+            const credentials = await getCredentials();
+            return new CloudWatchLogsClient({
+                region: 'us-west-2',
+                credentials,
+            });
+        } catch (err) {
+            console.error('Error initializing CW client', err);
+            throw err;
+        }
+    }
 
     /**
      * Calculate the size of a log entry in bytes
@@ -70,8 +74,9 @@ export const CWLoggingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 })),
             };
 
+            const client = await getClient();
             const command = new PutLogEventsCommand(params);
-            await cwClient.current?.send(command);
+            await client.send(command);
         } catch (error) {
             console.error('Error sending logs to CloudWatch:', error);
         }
@@ -110,7 +115,8 @@ export const CWLoggingProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 logStreamName,
             };
 
-            await cwClient.current?.send(new CreateLogStreamCommand(params));
+            const client = await getClient();
+            await client.send(new CreateLogStreamCommand(params));
         } catch (error) {
             if ((error as Error).name != 'ResourceAlreadyExistsException') {
                 console.error('Error creating log stream:', error);
